@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { userRepo } from "./user.repo";
+import bcrypt, { genSalt } from "bcrypt";
 
 //get | query
 const getAll = async (req: Request, res: Response) => {
@@ -30,17 +31,19 @@ const createUser = async (req: Request, res: Response) => {
   try {
     const { email, fname, lname, password, companyName, phoneNumber } =
       req.body;
-
+    const salt = bcrypt.genSaltSync(10);
+    const hash = await bcrypt.hash(password, salt);
     const userData = {
       email: email,
       fname: fname,
       lname: lname,
-      password: password,
+      password: hash,
       companyName: companyName,
-      phoneNumber: Number(phoneNumber),
+      phoneNumber: phoneNumber,
     };
 
     const user = await userRepo.createUser(userData);
+    console.log(user);
     res.json(user);
   } catch (e) {
     console.error(e);

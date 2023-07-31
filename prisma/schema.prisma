@@ -18,7 +18,7 @@ model User {
   dob             DateTime? @db.DateTime()
   email           String    @unique @db.VarChar(80)
   companyName     String    @db.VarChar(80)
-  password        String    @db.VarChar(50)
+  password        String    @db.VarChar(200)
   googleAuthToken String?   @db.VarChar(50)
   phoneNumber     Int       @db.Int
   username        String?   @unique @db.VarChar(50)

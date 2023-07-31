@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { NextFunction } from "express";
 const prisma = new PrismaClient();
 
 //get | query
