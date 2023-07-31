@@ -13,12 +13,15 @@ datasource db {
 model User {
   id              Int       @id @default(autoincrement())
   address         String?   @db.VarChar(50)
-  name            String    @db.VarChar(200)
+  fname           String    @db.VarChar(200)
+  lname           String    @db.VarChar(200)
   dob             DateTime? @db.DateTime()
   email           String    @unique @db.VarChar(80)
-  password        String?   @db.VarChar(50)
+  companyName     String    @db.VarChar(80)
+  password        String    @db.VarChar(50)
   googleAuthToken String?   @db.VarChar(50)
-  username        String    @unique @db.VarChar(50)
+  phoneNumber     Int       @db.Int
+  username        String?   @unique @db.VarChar(50)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   Posts           Post[]
