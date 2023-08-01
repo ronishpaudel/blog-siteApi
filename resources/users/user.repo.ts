@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { NextFunction } from "express";
+
 const prisma = new PrismaClient();
 
 //get | query
 export const getAll = async (offset: number, pageSize: number) => {
+  console.log("repo bhitra chiryo");
   return await prisma.user.findMany({
     skip: offset,
     take: pageSize,
@@ -18,6 +19,7 @@ export const getAllWithSearch = async (
   pageSize: number,
   searchVal: string
 ) => {
+  console.log("getAllwithSearch ko repo ma aayo");
   return await prisma.user.findMany({
     skip: offset,
     take: pageSize,

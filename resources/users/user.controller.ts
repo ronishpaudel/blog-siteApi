@@ -7,18 +7,20 @@ const getAll = async (req: Request, res: Response) => {
   const currentPage = Number(req.query.page) || 1;
   const pageSize = Number(req.query.page_size) || 10;
   const offset = pageSize * (currentPage - 1);
-  const searchVal = String(req.query.q);
+  const searchVal = req.query.q;
+  console.log("controller bhitra chiryo", { searchVal });
   try {
     if (!searchVal) {
-      const categories = await userRepo.getAll(offset, pageSize);
-      res.json(categories);
+      const users = await userRepo.getAll(offset, pageSize);
+      console.log("search val chaina", { users });
+      res.json(users);
     } else {
-      const todos = await userRepo.getAllWithSearch(
+      const users = await userRepo.getAllWithSearch(
         offset,
         pageSize,
-        searchVal
+        String(searchVal)
       );
-      res.json(todos);
+      res.json(users);
     }
   } catch (e) {
     console.log(e);

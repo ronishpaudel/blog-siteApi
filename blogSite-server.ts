@@ -6,12 +6,28 @@ const prisma = new PrismaClient();
 
 const app = express();
 var cors = require("cors");
+var jwt = require("jsonwebtoken");
 
 app.use(cors());
 app.use(express.json());
 const Port = 3001;
 
 app.use(userRoute);
+
+app.get("/verify/:token", (req, res) => {
+  const { token } = req.params;
+
+  // Verifying the JWT token
+  jwt.verify(token, "ourSecretKey", function (err: Error) {
+    if (err) {
+      console.log(err);
+      res.send(`Email verification failed, 
+                  possibly the link is invalid or expired`);
+    } else {
+      res.send("Email verifified successfully");
+    }
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("Hello,world");

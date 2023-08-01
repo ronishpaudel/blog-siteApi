@@ -4,7 +4,7 @@ import { userController } from ".";
 const userRoute = express.Router();
 
 // Query ROUTES
-userRoute.get("/user/signup", async (req, res) => {
+userRoute.get("/users", async (req, res) => {
   await userController.getAll(req, res);
 });
 
