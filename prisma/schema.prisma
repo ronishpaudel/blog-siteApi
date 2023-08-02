@@ -19,7 +19,8 @@ model User {
   email           String    @unique @db.VarChar(80)
   companyName     String    @db.VarChar(80)
   password        String    @db.VarChar(200)
-  isVerified      Boolean?  @default(false)
+  isVerified      Boolean   @default(false)
+  loginToken      String?   @db.VarChar(300)
   googleAuthToken String?   @db.VarChar(50)
   phoneNumber     Int       @db.Int
   username        String?   @unique @db.VarChar(50)
