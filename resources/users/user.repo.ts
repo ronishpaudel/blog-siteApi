@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient, User } from "@prisma/client";
+import { IUserData } from "../../types/Types";
 
 const prisma = new PrismaClient();
 
@@ -33,15 +34,30 @@ export const getAllWithSearch = async (
     },
   });
 };
-
+const getOneUser = async (payload: Prisma.UserWhereUniqueInput) => {
+  return await prisma.user.findUnique({
+    where: payload,
+  });
+};
+export const verifyUser = async (payload: Prisma.UserWhereUniqueInput) => {
+  return await prisma.user.update({
+    where: { email: payload.email },
+    data: {
+      isVerified: true,
+    },
+  });
+};
 //post | mutation
-export const createUser = async (userData: any) => {
+export const createUser = async (userData: IUserData) => {
   return await prisma.user.create({
     data: userData,
   });
 };
+
 export const userRepo = {
   createUser,
   getAll,
   getAllWithSearch,
+  getOneUser,
+  verifyUser,
 };
