@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient, User } from "@prisma/client";
-import { IUserData } from "../../types/Types";
+import { IUserData } from "../../types/types";
 
 const prisma = new PrismaClient();
 
@@ -39,6 +39,7 @@ const getOneUser = async (payload: Prisma.UserWhereUniqueInput) => {
     where: payload,
   });
 };
+
 export const verifyUser = async (payload: Prisma.UserWhereUniqueInput) => {
   return await prisma.user.update({
     where: { email: payload.email },
@@ -53,6 +54,12 @@ export const createUser = async (userData: IUserData) => {
     data: userData,
   });
 };
+const updateLoginToken = async (email: string, loginToken: string) => {
+  return prisma.user.update({
+    where: { email: email },
+    data: { loginToken: loginToken },
+  });
+};
 
 export const userRepo = {
   createUser,
@@ -60,4 +67,5 @@ export const userRepo = {
   getAllWithSearch,
   getOneUser,
   verifyUser,
+  updateLoginToken,
 };
