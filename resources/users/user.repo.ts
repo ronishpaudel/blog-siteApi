@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient, User } from "@prisma/client";
-import { IUserData } from "../../types/types";
+import { IUserData, Icategory } from "../../types/types";
 
 const prisma = new PrismaClient();
 
@@ -48,12 +48,45 @@ export const verifyUser = async (payload: Prisma.UserWhereUniqueInput) => {
     },
   });
 };
+//get of category by all and by seacrhval
+export const getAllCategory = async (offset: number, pageSize: number) => {
+  console.log("ayyo");
+  return await prisma.category.findMany({
+    skip: offset,
+    take: pageSize,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const getAllWithSearchCategory = async (
+  offset: number,
+  pageSize: number,
+  searchVal: string
+) => {
+  console.log("SEarchval vitra aayo");
+  return await prisma.category.findMany({
+    skip: offset,
+    take: pageSize,
+    where: {
+      name: {
+        contains: searchVal,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
 //post | mutation
 export const createUser = async (userData: IUserData) => {
   return await prisma.user.create({
     data: userData,
   });
 };
+
 const updateLoginToken = async (email: string, loginToken: string) => {
   return prisma.user.update({
     where: { email: email },
@@ -68,4 +101,6 @@ export const userRepo = {
   getOneUser,
   verifyUser,
   updateLoginToken,
+  getAllCategory,
+  getAllWithSearchCategory,
 };
