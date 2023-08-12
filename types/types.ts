@@ -9,3 +9,6 @@ export interface IUserData {
 export interface IUserVerified {
   isVerified: boolean;
 }
+export interface Icategory {
+  name: string;
+}
