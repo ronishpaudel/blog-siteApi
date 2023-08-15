@@ -1,7 +1,7 @@
 import express from "express";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { userRoute } from "./resources/users";
-import { checkUser } from "./resources/users/user.controller";
+import { checkJwt, checkUser } from "./resources/users/user.controller";
 import { v4 as uuid } from "uuid";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
 });
 app.get("/blogs", async (req, res) => {
   const currentPage = Number(req.query.page) || 1;
-  const pageSize = Number(req.query.page_size) || 6;
+  const pageSize = Number(req.query.page_size) || 10;
   const offset = pageSize * (currentPage - 1);
   const searchVal = req.query.q;
   try {
@@ -103,21 +103,29 @@ app.get("/blogs/:id", async (req, res) => {
 app.post("/blogs", async (req, res) => {
   try {
     const { title, description, imageUrl, categoryId } = req.body;
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).send("Unauthorized");
+    }
 
-    const posts = await prisma.post.create({
+    // Verify the token
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const id = decodedToken.id;
+
+    const todo = await prisma.post.create({
       data: {
         title: title,
         description: description,
         imageUrl: imageUrl,
         categoryId: categoryId as number,
+        userId: id,
       },
     });
-    return res.json(posts);
+    res.json(todo);
   } catch (e) {
-    if (e instanceof Error) return res.status(404).send(e.message);
+    if (e instanceof Error) res.status(404).send(e.message);
   }
 });
-
 app.put("/blogs", checkUser, async (req, res) => {
   try {
     const { id, title, description, imageUrl, categoryId } = req.body;
@@ -152,8 +160,8 @@ app.delete("/blogs/:id", async (req, res) => {
 });
 
 //image-upload url
-app.post("/s3_upload_url", async (req, res) => {
-  const BUCKET_NAME = "image-uploader";
+app.post("/s3_upload_url", async (_, res) => {
+  const BUCKET_NAME = "testing-todo";
   const BUCKET_URL = "https://testing-todo.s3.ap-south-1.amazonaws.com";
   const FOLDER_NAME = "blog_images";
   try {
@@ -191,6 +199,7 @@ app.post("/s3_upload_url", async (req, res) => {
     });
   }
 });
+
 app.post("/user/category", async (req, res) => {
   try {
     const { name } = req.body;
