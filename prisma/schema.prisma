@@ -34,7 +34,7 @@ model User {
 model Post {
   id          Int       @id @default(autoincrement())
   title       String    @db.VarChar(50)
-  description String    @db.VarChar(200)
+  description String    @db.LongText
   imageUrl    String?   @db.VarChar(200)
   user        User?     @relation(fields: [userId], references: [id])
   userId      Int?      @db.Int
@@ -44,7 +44,7 @@ model Post {
   updatedAt   DateTime  @updatedAt
   completed   Int       @default(0) @db.TinyInt
 
-  @@map("todos")
+  @@map("post")
 }
 
 model Category {
