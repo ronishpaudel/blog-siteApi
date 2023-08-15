@@ -1,8 +1,6 @@
-import express, { NextFunction } from "express";
-import { userController, userRepo } from ".";
-import jwt from "jsonwebtoken";
+import express from "express";
+import { userController } from ".";
 
-import { Prisma, PrismaClient } from "@prisma/client";
 import { checkJwt } from "./user.controller";
 
 const userRoute = express.Router();
