@@ -53,6 +53,13 @@ app.get("/blogs", async (req, res) => {
               name: true,
             },
           },
+          user: {
+            select: {
+              id: true,
+              fname: true,
+              lname: true,
+            },
+          },
           title: true,
           description: true,
           imageUrl: true,
@@ -117,7 +124,7 @@ app.post("/blogs", async (req, res) => {
         title: title,
         description: description,
         imageUrl: imageUrl,
-        categoryId: categoryId as number,
+        categoryId: categoryId,
         userId: id,
       },
     });
@@ -129,6 +136,12 @@ app.post("/blogs", async (req, res) => {
 app.put("/blogs", checkUser, async (req, res) => {
   try {
     const { id, title, description, imageUrl, categoryId } = req.body;
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).send("Unauthorized");
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const userId = decodedToken.id;
     const updatedBlogs = await prisma.post.update({
       where: {
         id: Number(id),
@@ -138,6 +151,7 @@ app.put("/blogs", checkUser, async (req, res) => {
         description: description,
         imageUrl: imageUrl,
         categoryId: categoryId as number,
+        userId: userId,
       },
     });
     return res.json(updatedBlogs);
