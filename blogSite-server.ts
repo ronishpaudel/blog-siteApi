@@ -64,6 +64,7 @@ app.get("/blogs", async (req, res) => {
           description: true,
           imageUrl: true,
           id: true,
+          createdAt: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -99,6 +100,25 @@ app.get("/blogs/:id", async (req, res) => {
     const posts = await prisma.post.findUnique({
       where: {
         id: Number(id),
+      },
+      select: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            fname: true,
+            lname: true,
+          },
+        },
+        title: true,
+        description: true,
+        imageUrl: true,
+        createdAt: true,
       },
     });
     return res.json(posts);
