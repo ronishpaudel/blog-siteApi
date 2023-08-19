@@ -63,6 +63,7 @@ app.get("/blogs", async (req, res) => {
           title: true,
           description: true,
           imageUrl: true,
+          thumbImageUrl: true,
           id: true,
           createdAt: true,
         },
@@ -119,6 +120,7 @@ app.get("/blogs/:id", async (req, res) => {
         description: true,
         imageUrl: true,
         createdAt: true,
+        thumbImageUrl: true,
       },
     });
     return res.json(posts);
@@ -129,7 +131,8 @@ app.get("/blogs/:id", async (req, res) => {
 
 app.post("/blogs", async (req, res) => {
   try {
-    const { title, description, imageUrl, categoryId } = req.body;
+    const { title, description, imageUrl, categoryId, thumbImageUrl } =
+      req.body;
     const token = req.headers.authorization;
     if (!token) {
       return res.status(401).send("Unauthorized");
@@ -146,6 +149,7 @@ app.post("/blogs", async (req, res) => {
         imageUrl: imageUrl,
         categoryId: categoryId,
         userId: id,
+        thumbImageUrl,
       },
     });
     res.json(todo);
@@ -155,7 +159,8 @@ app.post("/blogs", async (req, res) => {
 });
 app.put("/blogs", checkUser, async (req, res) => {
   try {
-    const { id, title, description, imageUrl, categoryId } = req.body;
+    const { id, title, description, imageUrl, categoryId, thumbImageUrl } =
+      req.body;
     const token = req.headers.authorization;
     if (!token) {
       return res.status(401).send("Unauthorized");
@@ -172,6 +177,7 @@ app.put("/blogs", checkUser, async (req, res) => {
         imageUrl: imageUrl,
         categoryId: categoryId as number,
         userId: userId,
+        thumbImageUrl,
       },
     });
     return res.json(updatedBlogs);
@@ -216,9 +222,9 @@ app.post("/s3_upload_url", async (_, res) => {
     const uploadUrl = await getSignedUrl(imageClient, command, {
       expiresIn: 60 * 30,
     });
-
+    console.log({ uploadUrl });
     const url = `${BUCKET_URL}//${FOLDER_NAME}/${id}.jpg`;
-
+    console.log({ url });
     return res.send({
       message: "Successfully created upload URL",
       data: {
