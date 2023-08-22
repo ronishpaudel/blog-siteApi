@@ -9,4 +9,7 @@ blogRoute.get("/blogs", async (req, res) => {
 blogRoute.get("/blogs/:id", async (req, res) => {
   await blogController.getBlogById(req, res);
 });
+// blogRoute.post("/blogs", async (req, res) => {
+//   await blogController.createBlog(req, res);
+// });
 export { blogRoute };

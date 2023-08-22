@@ -34,28 +34,33 @@ const getBlogById = async (req: Request, res: Response) => {
 };
 
 //post-mutation for blogs
-const createBlog = async (req: Request, res: Response) => {
-  const { title, description, imageUrl, categoryId, thumbImageUrl } = req.body;
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).send("Unauthorized");
-  }
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  const id = decodedToken.id;
-  const blogData = {
-    title,
-    description,
-    imageUrl,
-    categoryId,
-    thumbImageUrl,
-    userId: id,
-  };
-  const blog = await blogRepo.createBlog(blogData);
-  return res.json(blog);
-};
+// const createBlog = async (req: Request, res: Response) => {
+//   try {
+//     const { title, description, imageUrl, categoryId, thumbImageUrl } =
+//       req.body;
+//     const token = req.headers.authorization;
+//     if (!token) {
+//       return res.status(401).send("Unauthorized");
+//     }
+//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+//     const id = decodedToken.id;
+//     const blogData = {
+//       title,
+//       description,
+//       imageUrl,
+//       categoryId,
+//       thumbImageUrl,
+//       userId: id,
+//     };
+//     const blog = await blogRepo.createBlog(blogData);
+//     return res.json(blog);
+//   } catch (e) {
+//     if (e instanceof Error) res.status(404).send(e.message);
+//   }
+// };
 
 export const blogController = {
   getAll,
   getBlogById,
-  createBlog,
+  //   createBlog,
 };
