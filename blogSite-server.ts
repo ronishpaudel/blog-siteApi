@@ -1,10 +1,9 @@
 import express from "express";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { userRoute } from "./resources/users";
-import { checkJwt, checkUser } from "./resources/users/user.controller";
-import { v4 as uuid } from "uuid";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { checkUser } from "./resources/users/user.controller";
+import { s3Upload } from "./utils/s3Upload";
+import { blogRoute } from "./blogSite-server/blog.route";
 
 const prisma = new PrismaClient();
 
@@ -17,6 +16,7 @@ app.use(express.json());
 const Port = 3001;
 
 app.use(userRoute);
+app.use(blogRoute);
 
 app.get("/verify/:token", (req, res) => {
   const { token } = req.params;
@@ -36,98 +36,98 @@ app.get("/verify/:token", (req, res) => {
 app.get("/", (req, res) => {
   return res.send("Hello,world");
 });
-app.get("/blogs", async (req, res) => {
-  const currentPage = Number(req.query.page) || 1;
-  const pageSize = Number(req.query.page_size) || 10;
-  const offset = pageSize * (currentPage - 1);
-  const searchVal = req.query.q;
-  try {
-    if (!searchVal) {
-      const posts = await prisma.post.findMany({
-        skip: offset,
-        take: pageSize,
-        select: {
-          category: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          user: {
-            select: {
-              id: true,
-              fname: true,
-              lname: true,
-            },
-          },
-          title: true,
-          description: true,
-          imageUrl: true,
-          thumbImageUrl: true,
-          id: true,
-          createdAt: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-      return res.json(posts);
-    } else {
-      const posts = await prisma.post.findMany({
-        skip: offset,
-        take: pageSize,
-        select: {
-          category: true,
-        },
-        where: {
-          title: {
-            contains: String(searchVal),
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-      return res.json(posts);
-    }
-  } catch (e) {
-    return res.status(404).send("Not Found");
-  }
-});
+// app.get("/blogs", async (req, res) => {
+//   const currentPage = Number(req.query.page) || 1;
+//   const pageSize = Number(req.query.page_size) || 10;
+//   const offset = pageSize * (currentPage - 1);
+//   const searchVal = req.query.q;
+//   try {
+//     if (!searchVal) {
+//       const posts = await prisma.post.findMany({
+//         skip: offset,
+//         take: pageSize,
+//         select: {
+//           category: {
+//             select: {
+//               id: true,
+//               name: true,
+//             },
+//           },
+//           user: {
+//             select: {
+//               id: true,
+//               fname: true,
+//               lname: true,
+//             },
+//           },
+//           title: true,
+//           description: true,
+//           imageUrl: true,
+//           thumbImageUrl: true,
+//           id: true,
+//           createdAt: true,
+//         },
+//         orderBy: {
+//           createdAt: "desc",
+//         },
+//       });
+//       return res.json(posts);
+//     } else {
+//       const posts = await prisma.post.findMany({
+//         skip: offset,
+//         take: pageSize,
+//         select: {
+//           category: true,
+//         },
+//         where: {
+//           title: {
+//             contains: String(searchVal),
+//           },
+//         },
+//         orderBy: {
+//           createdAt: "desc",
+//         },
+//       });
+//       return res.json(posts);
+//     }
+//   } catch (e) {
+//     return res.status(404).send("Not Found");
+//   }
+// });
 
-app.get("/blogs/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const posts = await prisma.post.findUnique({
-      where: {
-        id: Number(id),
-      },
-      select: {
-        category: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            fname: true,
-            lname: true,
-          },
-        },
-        title: true,
-        description: true,
-        imageUrl: true,
-        createdAt: true,
-        thumbImageUrl: true,
-      },
-    });
-    return res.json(posts);
-  } catch (e) {
-    return res.status(404).send("there is no such id in todos");
-  }
-});
+// app.get("/blogs/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const posts = await prisma.post.findUnique({
+//       where: {
+//         id: Number(id),
+//       },
+//       select: {
+//         category: {
+//           select: {
+//             id: true,
+//             name: true,
+//           },
+//         },
+//         user: {
+//           select: {
+//             id: true,
+//             fname: true,
+//             lname: true,
+//           },
+//         },
+//         title: true,
+//         description: true,
+//         imageUrl: true,
+//         createdAt: true,
+//         thumbImageUrl: true,
+//       },
+//     });
+//     return res.json(posts);
+//   } catch (e) {
+//     return res.status(404).send("there is no such id in todos");
+//   }
+// });
 
 app.post("/blogs", async (req, res) => {
   try {
@@ -201,36 +201,12 @@ app.delete("/blogs/:id", async (req, res) => {
 
 //image-upload url
 app.post("/s3_upload_url", async (_, res) => {
-  const BUCKET_NAME = "testing-todo";
-  const BUCKET_URL = "https://testing-todo.s3.ap-south-1.amazonaws.com";
-  const FOLDER_NAME = "blog_images";
   try {
-    const id = uuid();
-    const command = new PutObjectCommand({
-      ACL: "public-read",
-      Bucket: BUCKET_NAME,
-      Key: `/${FOLDER_NAME}/${id}.jpg`,
-    });
-    // console.log(process.env.ACCESS_KEY);
-    const imageClient = new S3Client({
-      region: "ap-south-1",
-      credentials: {
-        accessKeyId: process.env.ACCESS_KEY!!,
-        secretAccessKey: process.env.SECRET_ACCESS_KEY!!,
-      },
-    });
-    const uploadUrl = await getSignedUrl(imageClient, command, {
-      expiresIn: 60 * 30,
-    });
-    console.log({ uploadUrl });
-    const url = `${BUCKET_URL}//${FOLDER_NAME}/${id}.jpg`;
-    console.log({ url });
+    const thumbnailUpload = await s3Upload();
+    const normalUpload = await s3Upload();
     return res.send({
       message: "Successfully created upload URL",
-      data: {
-        uploadUrl,
-        url,
-      },
+      data: { thumbnailUpload, normalUpload },
     });
   } catch (error) {
     return res.status(400).send({
@@ -257,3 +233,4 @@ app.post("/user/category", async (req, res) => {
 app.listen(Port, () => {
   console.log(`Server up on port ${Port}`);
 });
+export { blogRoute };
