@@ -12,3 +12,11 @@ export interface IUserVerified {
 export interface Icategory {
   name: string;
 }
+
+export interface IBlog {
+  title: string;
+  description: string;
+  imageUrl?: string;
+  categoryId?: number;
+  thumbImageUrl?: string;
+}
