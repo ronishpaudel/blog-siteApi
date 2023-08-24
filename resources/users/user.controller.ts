@@ -58,8 +58,7 @@ const getAllCategory = async (req: Request, res: Response) => {
 
 //post | mutation for user
 const createUser = async (req: Request, res: Response) => {
-  const { id, email, fname, lname, password, companyName, phoneNumber } =
-    req.body;
+  const { id, email, fname, lname, password, phoneNumber } = req.body;
 
   try {
     const existingUser = await userRepo.getOneUser({ email: email });
@@ -74,7 +73,6 @@ const createUser = async (req: Request, res: Response) => {
       fname: fname,
       password: hash,
       lname: lname,
-      companyName: companyName,
       phoneNumber: phoneNumber,
     };
     const user = await userRepo.createUser(userData);
