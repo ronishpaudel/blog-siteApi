@@ -17,7 +17,6 @@ model User {
   lname           String    @db.VarChar(200)
   dob             DateTime? @db.DateTime()
   email           String    @unique @db.VarChar(80)
-  companyName     String    @db.VarChar(80)
   password        String    @db.VarChar(200)
   isVerified      Boolean   @default(false)
   loginToken      String?   @db.VarChar(300)
