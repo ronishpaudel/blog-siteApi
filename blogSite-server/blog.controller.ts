@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 //get-query for blogs
 const getAll = async (req: Request, res: Response) => {
   const currentPage = Number(req.query.page) || 1;
-  const pageSize = Number(req.query.page_size) || 10;
+  const pageSize = Number(req.query.page_size) || 9;
   const offset = pageSize * (currentPage - 1);
   const searchVal = req.query.q;
   try {
