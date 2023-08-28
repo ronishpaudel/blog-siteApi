@@ -73,7 +73,7 @@ const createUser = async (req: Request, res: Response) => {
       fname: fname,
       password: hash,
       lname: lname,
-      phoneNumber: phoneNumber,
+      phoneNumber: String(phoneNumber),
     };
     const user = await userRepo.createUser(userData);
     console.log({ user });
