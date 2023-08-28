@@ -3,6 +3,8 @@ import { userRepo } from "./user.repo";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "@prisma/client";
+import { SendTemplatedEmailCommand } from "@aws-sdk/client-ses";
+import { sesClient } from "../../utils/ses";
 
 //get | query
 const getAll = async (req: Request, res: Response) => {
@@ -73,7 +75,7 @@ const createUser = async (req: Request, res: Response) => {
       fname: fname,
       password: hash,
       lname: lname,
-      phoneNumber: phoneNumber,
+      phoneNumber: String(phoneNumber),
     };
     const user = await userRepo.createUser(userData);
     console.log({ user });
@@ -90,6 +92,18 @@ const createUser = async (req: Request, res: Response) => {
     console.log({ accessToken });
     const link = `${process.env.BLOG_PAGE}?token=${accessToken}`;
     console.log({ link });
+
+    //send verify email
+    const params = {
+      Destination: {
+        ToAddresses: [email],
+      },
+      Source: "swikarsharma@gmail.com",
+      Template: "EmailVerification",
+      TemplateData: `{ "link": "${link}" }`,
+      ReplyToAddresses: [],
+    };
+    sesClient.send(new SendTemplatedEmailCommand(params));
 
     return res.json(user);
   } catch (e) {

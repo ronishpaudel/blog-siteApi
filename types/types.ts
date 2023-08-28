@@ -1,7 +1,7 @@
 export interface IUserData {
   fname: string;
   lname: string;
-  phoneNumber: number;
+  phoneNumber: string;
 
   password: string;
   email: string;

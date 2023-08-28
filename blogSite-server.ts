@@ -234,3 +234,15 @@ app.listen(Port, () => {
   console.log(`Server up on port ${Port}`);
 });
 export { blogRoute };
+
+// email verification template sample
+var EmailVerificationTemplate = {
+  Template: {
+    TemplateName: "EmailVerification",
+    SubjectPart: "Verify your email at techEra blogs",
+    HtmlPart:
+      "<h1>Hello,</h1><h3>Please use the following link to verify your email address.</h3> {{link}}",
+    TextPart:
+      "Hello,\r\nPlease use the following link to verify your email address. {{link}}.",
+  },
+};
