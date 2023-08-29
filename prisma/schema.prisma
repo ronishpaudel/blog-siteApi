@@ -14,8 +14,8 @@ datasource db {
 model User {
   id              Int       @id @default(autoincrement())
   address         String?   @db.VarChar(50)
-  fname           String    @db.VarChar(40)
-  lname           String    @db.VarChar(40)
+  fname           String?   @db.VarChar(40)
+  lname           String?   @db.VarChar(40)
   dob             DateTime? @db.DateTime()
   email           String    @unique @db.VarChar(80)
   password        String    @db.VarChar(180)
