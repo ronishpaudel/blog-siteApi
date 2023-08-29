@@ -18,8 +18,7 @@ export const getAll = async (offset: number, pageSize: number) => {
       user: {
         select: {
           id: true,
-          fname: true,
-          lname: true,
+          username: true,
         },
       },
       title: true,
@@ -45,7 +44,7 @@ const getAllWithSearch = async (
     skip: offset,
     take: pageSize,
     where: {
-      fname: {
+      username: {
         contains: searchVal,
       },
     },
@@ -70,8 +69,7 @@ const getBlogById = async (id: number) => {
       user: {
         select: {
           id: true,
-          fname: true,
-          lname: true,
+          username: true,
         },
       },
       title: true,
