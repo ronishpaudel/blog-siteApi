@@ -1,8 +1,8 @@
 export interface IUserData {
-  fname: string;
-  lname: string;
-  phoneNumber: string;
-
+  fname?: string;
+  lname?: string;
+  phoneNumber?: string;
+  username: string;
   password: string;
   email: string;
 }

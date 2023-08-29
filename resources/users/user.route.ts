@@ -6,7 +6,7 @@ import { checkJwt } from "./user.controller";
 const userRoute = express.Router();
 
 // Query ROUTES
-userRoute.get("/users", checkJwt, async (req, res) => {
+userRoute.get("/user", checkJwt, async (req, res) => {
   await userController.getAll(req, res);
 });
 
@@ -16,10 +16,9 @@ userRoute.get("/user/category", async (req, res) => {
 
 userRoute.get("/user/me", checkJwt, async (req, res) => {
   try {
-    console.log("hello");
-    const { id, fname, lname, email } = req.authUser;
-    console.log({ id, fname, lname, email });
-    return res.status(200).json({ id, fname, lname, email });
+    const { id, username, email } = req.authUser;
+
+    return res.status(200).json({ id, username, email });
   } catch (error) {
     return res.status(500).json({ message: " server error." });
   }

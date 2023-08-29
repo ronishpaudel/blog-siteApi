@@ -16,7 +16,7 @@ const getAll = async (req: Request, res: Response) => {
   try {
     if (!searchVal) {
       const users = await userRepo.getAll(offset, pageSize);
-      console.log("search val chaina", { users });
+      // console.log("search val chaina", { users });
       return res.json(users);
     } else {
       const users = await userRepo.getAllWithSearch(
@@ -43,7 +43,7 @@ const getAllCategory = async (req: Request, res: Response) => {
   try {
     if (!searchVal) {
       const categories = await userRepo.getAllCategory(offset, pageSize);
-      console.log("search val chaina", { categories });
+      // console.log("search val chaina", { categories });
       res.json(categories);
     } else {
       const category = await userRepo.getAllWithSearchCategory(
@@ -60,7 +60,7 @@ const getAllCategory = async (req: Request, res: Response) => {
 
 //post | mutation for user
 const createUser = async (req: Request, res: Response) => {
-  const { id, email, fname, lname, password, phoneNumber } = req.body;
+  const { id, email, fname, lname, password, phoneNumber, username } = req.body;
 
   try {
     const existingUser = await userRepo.getOneUser({ email: email });
@@ -72,6 +72,7 @@ const createUser = async (req: Request, res: Response) => {
     const hash = await bcrypt.hash(password, salt);
     const userData = {
       email: email,
+      username,
       fname: fname,
       password: hash,
       lname: lname,
@@ -183,7 +184,7 @@ export const checkJwt = async (
   console.log("token in middleware:", token);
   try {
     const { verify } = jwt;
-    const decoded: any = verify(token as string, process.env.JWT_SECRET_KEY!);
+    const decoded: any = verify(token, process.env.JWT_SECRET_KEY!);
     const user = await userRepo.getOneUser({ id: decoded.id });
     req.authUser = user as User;
 

@@ -87,20 +87,12 @@ export const createUser = async (userData: IUserData) => {
   });
 };
 
-const updateLoginToken = async (email: string, loginToken: string) => {
-  return prisma.user.update({
-    where: { email: email },
-    data: { loginToken: loginToken },
-  });
-};
-
 export const userRepo = {
   createUser,
   getAll,
   getAllWithSearch,
   getOneUser,
   verifyUser,
-  updateLoginToken,
   getAllCategory,
   getAllWithSearchCategory,
 };
