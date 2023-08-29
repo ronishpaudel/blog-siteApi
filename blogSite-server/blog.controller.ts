@@ -1,6 +1,5 @@
 import { blogRepo } from "./blog.repo";
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
 
 //get-query for blogs
 const getAll = async (req: Request, res: Response) => {
