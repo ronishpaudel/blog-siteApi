@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { userRoute } from "./resources/users";
-import { checkUser } from "./resources/users/user.controller";
+import { checkJwt, checkUser } from "./resources/users/user.controller";
 import { s3Upload } from "./utils/s3Upload";
 import { blogRoute } from "./blogSite-server/blog.route";
 
@@ -13,160 +13,21 @@ var jwt = require("jsonwebtoken");
 
 app.use(cors());
 app.use(express.json());
-const Port = 3001;
+const Port = 3005;
 
 app.use(userRoute);
 app.use(blogRoute);
 
-app.get("/verify/:token", (req, res) => {
-  const { token } = req.params;
-
-  // Verifying the JWT token
-  jwt.verify(token, "ourSecretKey", function (err: Error) {
-    if (err) {
-      console.log(err);
-      return res.send(`Email verification failed, 
-                  possibly the link is invalid or expired`);
-    } else {
-      return res.send("Email verifified successfully");
-    }
-  });
-});
-
 app.get("/", (req, res) => {
   return res.send("Hello,world");
 });
-// app.get("/blogs", async (req, res) => {
-//   const currentPage = Number(req.query.page) || 1;
-//   const pageSize = Number(req.query.page_size) || 10;
-//   const offset = pageSize * (currentPage - 1);
-//   const searchVal = req.query.q;
-//   try {
-//     if (!searchVal) {
-//       const posts = await prisma.post.findMany({
-//         skip: offset,
-//         take: pageSize,
-//         select: {
-//           category: {
-//             select: {
-//               id: true,
-//               name: true,
-//             },
-//           },
-//           user: {
-//             select: {
-//               id: true,
-//               fname: true,
-//               lname: true,
-//             },
-//           },
-//           title: true,
-//           description: true,
-//           imageUrl: true,
-//           thumbImageUrl: true,
-//           id: true,
-//           createdAt: true,
-//         },
-//         orderBy: {
-//           createdAt: "desc",
-//         },
-//       });
-//       return res.json(posts);
-//     } else {
-//       const posts = await prisma.post.findMany({
-//         skip: offset,
-//         take: pageSize,
-//         select: {
-//           category: true,
-//         },
-//         where: {
-//           title: {
-//             contains: String(searchVal),
-//           },
-//         },
-//         orderBy: {
-//           createdAt: "desc",
-//         },
-//       });
-//       return res.json(posts);
-//     }
-//   } catch (e) {
-//     return res.status(404).send("Not Found");
-//   }
-// });
 
-// app.get("/blogs/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const posts = await prisma.post.findUnique({
-//       where: {
-//         id: Number(id),
-//       },
-//       select: {
-//         category: {
-//           select: {
-//             id: true,
-//             name: true,
-//           },
-//         },
-//         user: {
-//           select: {
-//             id: true,
-//             fname: true,
-//             lname: true,
-//           },
-//         },
-//         title: true,
-//         description: true,
-//         imageUrl: true,
-//         createdAt: true,
-//         thumbImageUrl: true,
-//       },
-//     });
-//     return res.json(posts);
-//   } catch (e) {
-//     return res.status(404).send("there is no such id in todos");
-//   }
-// });
-
-app.post("/blogs", async (req, res) => {
-  try {
-    const { title, description, imageUrl, categoryId, thumbImageUrl } =
-      req.body;
-    const token = req.headers.authorization;
-    if (!token) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    // Verify the token
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const id = decodedToken.id;
-
-    const todo = await prisma.post.create({
-      data: {
-        title: title,
-        description: description,
-        imageUrl: imageUrl,
-        categoryId: categoryId,
-        userId: id,
-        thumbImageUrl,
-      },
-    });
-    res.json(todo);
-  } catch (e) {
-    if (e instanceof Error) res.status(404).send(e.message);
-  }
-});
-app.put("/blogs", checkUser, async (req, res) => {
+app.put("/blogs", checkJwt, async (req, res) => {
   try {
     const { id, title, description, imageUrl, categoryId, thumbImageUrl } =
       req.body;
-    const token = req.headers.authorization;
-    if (!token) {
-      return res.status(401).send("Unauthorized");
-    }
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const userId = decodedToken.id;
+    const authUser = req.authUser;
+
     const updatedBlogs = await prisma.post.update({
       where: {
         id: Number(id),
@@ -176,7 +37,7 @@ app.put("/blogs", checkUser, async (req, res) => {
         description: description,
         imageUrl: imageUrl,
         categoryId: categoryId as number,
-        userId: userId,
+        userId: authUser.id,
         thumbImageUrl,
       },
     });
@@ -235,7 +96,7 @@ app.listen(Port, () => {
 });
 export { blogRoute };
 
-// email verification template sample
+// email verification template sample not being used just for reading purpose
 var EmailVerificationTemplate = {
   Template: {
     TemplateName: "EmailVerification",
