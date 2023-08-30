@@ -39,12 +39,11 @@ const getAllWithSearch = async (
   pageSize: number,
   searchVal: string
 ) => {
-  console.log("getAllwithSearch ko repo ma aayo");
-  return await prisma.user.findMany({
+  return await prisma.post.findMany({
     skip: offset,
     take: pageSize,
     where: {
-      username: {
+      title: {
         contains: searchVal,
       },
     },
