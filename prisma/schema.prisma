@@ -18,12 +18,12 @@ model User {
   lname           String?   @db.VarChar(40)
   dob             DateTime? @db.DateTime()
   email           String    @unique @db.VarChar(80)
+  username        String    @unique @db.VarChar(25)
   password        String    @db.VarChar(180)
   isVerified      Boolean   @default(false)
   loginToken      String?   @db.VarChar(100)
   googleAuthToken String?   @db.VarChar(50)
   phoneNumber     String?   @db.VarChar(18)
-  username        String?   @unique @db.VarChar(25)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   Posts           Post[]
