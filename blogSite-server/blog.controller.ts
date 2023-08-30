@@ -10,7 +10,7 @@ const getAll = async (req: Request, res: Response) => {
   try {
     if (!searchVal) {
       const blogs = await blogRepo.getAll(offset, pageSize);
-      // console.log("search val chaina", { blogs: blogs });
+
       return res.json(blogs);
     } else {
       const blogs = await blogRepo.getAllWithSearch(
