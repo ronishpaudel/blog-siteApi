@@ -142,13 +142,20 @@ const verification = async (req: Request, res: Response) => {
 
 //signin
 const signin = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, username, password } = req.body;
   const jwtToken = req.headers["authorization"];
-  console.log("JWT Token:", jwtToken);
+
   try {
-    const existingUser = await userRepo.getOneUser({ email });
+    let existingUser;
+    if (username) {
+      existingUser = await userRepo.getOneUser({ username });
+    } else if (email) {
+      existingUser = await userRepo.getOneUser({ email });
+    } else {
+      return res.status(400).json({ message: "Missing username or email" });
+    }
     if (!existingUser) {
-      return res.status(400).json({ message: "Invalid Credentials" });
+      return res.status(400).json({ message: "not existingUser" });
     }
     const matchPassword = bcrypt.compareSync(
       password,
