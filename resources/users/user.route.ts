@@ -39,4 +39,11 @@ userRoute.post("/user/signin", async (req, res) => {
   await userController.signin(req, res);
 });
 
+userRoute.post("/user/reset-password", async (req, res) => {
+  await userController.resetPassword(req, res);
+});
+
+userRoute.post("/user/update-password", async (req, res) => {
+  await userController.updatePassword(req, res);
+});
 export { userRoute };
