@@ -33,7 +33,8 @@ model User {
 
 model Post {
   id            Int       @id @default(autoincrement())
-  title         String    @db.VarChar(50)
+  title         String    @db.VarChar(120)
+  slug          String    @unique @db.VarChar(130)
   description   String    @db.LongText
   imageUrl      String?   @db.VarChar(150)
   thumbImageUrl String?   @db.VarChar(150)
