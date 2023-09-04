@@ -1,3 +1,4 @@
+import { randomNumber } from "../utils/randomNumber";
 import { blogRepo } from "./blog.repo";
 import { NextFunction, Request, Response } from "express";
 
@@ -32,6 +33,12 @@ const getBlogById = async (req: Request, res: Response) => {
   return res.json(blogs);
 };
 
+const getBlogBySlug = async (req: Request, res: Response) => {
+  const { slug } = req.params;
+  const blogs = await blogRepo.getBlogBySlug(slug);
+  return res.json(blogs);
+};
+
 // post-mutation for blogs
 const createBlog = async (req: Request, res: Response) => {
   try {
@@ -39,6 +46,8 @@ const createBlog = async (req: Request, res: Response) => {
       req.body;
 
     const authUser = req.authUser;
+    const slug =
+      title.toLowerCase().replaceAll(" ", "-") + String(randomNumber());
 
     const blogData = {
       title,
@@ -47,7 +56,11 @@ const createBlog = async (req: Request, res: Response) => {
       categoryId,
       thumbImageUrl,
       userId: authUser.id,
+      slug,
     };
+
+    console.log({ blogData });
+
     const blog = await blogRepo.createBlog(blogData);
     return res.json(blog);
   } catch (e) {
@@ -59,4 +72,5 @@ export const blogController = {
   getAll,
   getBlogById,
   createBlog,
+  getBlogBySlug,
 };
