@@ -1,9 +1,10 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { userRoute } from "./resources/users";
-import { checkJwt, checkUser } from "./resources/users/user.controller";
+import { verifyUser } from "./resources/users/user.controller";
 import { s3Upload } from "./utils/s3Upload";
 import { blogRoute } from "./blogSite-server/blog.route";
+import { OAuth2Client, TokenPayload } from "google-auth-library";
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,7 @@ var jwt = require("jsonwebtoken");
 
 app.use(cors());
 app.use(express.json());
-const Port = 3005;
+const Port = 3007;
 
 app.use(userRoute);
 app.use(blogRoute);
@@ -22,7 +23,7 @@ app.get("/", (req, res) => {
   return res.send("Hello,world");
 });
 
-app.put("/blogs", checkJwt, async (req, res) => {
+app.put("/blogs", verifyUser, async (req, res) => {
   try {
     const { id, title, description, imageUrl, categoryId, thumbImageUrl } =
       req.body;
@@ -107,3 +108,66 @@ var EmailVerificationTemplate = {
       "Hello,\r\nPlease use the following link to verify your email address. {{link}}.",
   },
 };
+const CLIENT_ID = process.env.CLIENT_ID;
+const oAuthClient = new OAuth2Client(CLIENT_ID);
+
+app.post("/user/registration", async (req, res) => {
+  const { googleAuthToken, username } = req.body;
+  if (!CLIENT_ID) return;
+  console.log("Received googleToken:", googleAuthToken);
+  let newUser = null;
+  let hasUsername = false;
+  try {
+    console.log("on try");
+    const ticket = await oAuthClient.verifyIdToken({
+      idToken: String(googleAuthToken),
+      audience: [CLIENT_ID],
+    });
+
+    const payload: TokenPayload | undefined = ticket.getPayload();
+    if (!payload) {
+      throw new Error("Invalid token payload");
+    }
+    console.log("payload", payload);
+    const name = payload.given_name || payload.family_name || "";
+    const email = payload.email;
+
+    // Check if email is defined
+    if (!email) {
+      throw new Error("Email is undefined");
+    }
+
+    let newUser = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!newUser) {
+      newUser = await prisma.user.create({
+        data: {
+          email: email,
+          username: name,
+          googleAuthToken: googleAuthToken,
+        },
+      });
+    } else {
+      if (newUser.username) {
+        hasUsername = true;
+      } else {
+        newUser = await prisma.user.update({
+          where: {
+            email: email,
+          },
+          data: {
+            username: username,
+          },
+        });
+      }
+    }
+    res.json({ ...newUser, hasUsername: hasUsername });
+  } catch (e) {
+    console.error("User creation failed:", e);
+    res.status(401).send("User creation failed");
+  }
+});
