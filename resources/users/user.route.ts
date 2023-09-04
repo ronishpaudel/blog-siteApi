@@ -1,12 +1,12 @@
 import express from "express";
 import { userController } from ".";
 
-import { checkJwt } from "./user.controller";
+import { verifyUser } from "./user.controller";
 
 const userRoute = express.Router();
 
 // Query ROUTES
-userRoute.get("/user", checkJwt, async (req, res) => {
+userRoute.get("/user", verifyUser, async (req, res) => {
   await userController.getAll(req, res);
 });
 
@@ -14,7 +14,7 @@ userRoute.get("/user/category", async (req, res) => {
   await userController.getAllCategory(req, res);
 });
 
-userRoute.get("/user/me", checkJwt, async (req, res) => {
+userRoute.get("/user/me", verifyUser, async (req, res) => {
   try {
     const { id, username, email } = req.authUser;
 
