@@ -9,6 +9,9 @@ export const getAll = async (offset: number, pageSize: number) => {
   return await prisma.user.findMany({
     skip: offset,
     take: pageSize,
+    select: {
+      isVerified: true,
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -87,6 +90,15 @@ export const createUser = async (userData: IUserData) => {
   });
 };
 
+const updatePassword = async (email: string, password: string) => {
+  return await prisma.user.update({
+    where: { email },
+    data: {
+      password,
+    },
+  });
+};
+
 export const userRepo = {
   createUser,
   getAll,
@@ -95,4 +107,5 @@ export const userRepo = {
   verifyUser,
   getAllCategory,
   getAllWithSearchCategory,
+  updatePassword,
 };
