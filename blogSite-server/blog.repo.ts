@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import { IBlog } from "../types/types";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -27,6 +26,7 @@ export const getAll = async (offset: number, pageSize: number) => {
       thumbImageUrl: true,
       id: true,
       createdAt: true,
+      slug: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -46,6 +46,27 @@ const getAllWithSearch = async (
       title: {
         contains: searchVal,
       },
+    },
+    select: {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+      title: true,
+      description: true,
+      imageUrl: true,
+      thumbImageUrl: true,
+      id: true,
+      createdAt: true,
+      slug: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -77,11 +98,41 @@ const getBlogById = async (id: number) => {
       thumbImageUrl: true,
       id: true,
       createdAt: true,
+      slug: true,
     },
   });
 };
 
-const createBlog = async (blogData: IBlog) => {
+const getBlogBySlug = async (slug: string) => {
+  return await prisma.post.findUnique({
+    where: {
+      slug,
+    },
+    select: {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+      title: true,
+      description: true,
+      imageUrl: true,
+      thumbImageUrl: true,
+      id: true,
+      createdAt: true,
+      slug: true,
+    },
+  });
+};
+
+const createBlog = async (blogData: Prisma.PostCreateArgs["data"]) => {
   return await prisma.post.create({
     data: blogData,
   });
@@ -92,4 +143,5 @@ export const blogRepo = {
   getAllWithSearch,
   getBlogById,
   createBlog,
+  getBlogBySlug,
 };
