@@ -47,7 +47,7 @@ const createBlog = async (req: Request, res: Response) => {
 
     const authUser = req.authUser;
     const slug =
-      title.toLowerCase().replaceAll(" ", "-") + String(randomNumber());
+      title.toLowerCase().replaceAll(" ", "-") + "-" + String(randomNumber());
 
     const blogData = {
       title,
