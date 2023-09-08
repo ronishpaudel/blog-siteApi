@@ -59,14 +59,15 @@ const getAllCategory = async (req: Request, res: Response) => {
 };
 
 //post | mutation for user
+//signup
 const createUser = async (req: Request, res: Response) => {
   const { id, email, fname, lname, password, phoneNumber, username } = req.body;
 
   try {
     const existingUser = await userRepo.getOneUser({ email: email });
     if (existingUser) {
-      // return res.status(400).json({ message: "User already exists" });
-      throw "user already exists";
+      return res.status(400).json({ message: "User already exists" });
+      // throw "user already exists";
     }
     const salt = bcrypt.genSaltSync(10);
     const hash = await bcrypt.hash(password, salt);
@@ -82,31 +83,31 @@ const createUser = async (req: Request, res: Response) => {
     console.log({ user });
 
     const { sign } = jwt;
-    const accessToken = sign(
+    const token = sign(
       {
         email: email,
-        id: id,
-        iat: Math.floor(Date.now() / 1000) - 30,
+        id: user.id,
+        // exp: 10 * 60 * 1000,
       },
       process.env.JWT_SECRET_KEY!
     );
-    console.log({ accessToken });
-    const link = `${process.env.BLOG_PAGE}?token=${accessToken}`;
+    console.log({ accessToken: token });
+    const link = `${process.env.BLOG_PAGE}?token=${token}`;
     console.log({ link });
 
     //send verify email
-    const params = {
-      Destination: {
-        ToAddresses: [email],
-      },
-      Source: "swikarsharma@gmail.com",
-      Template: "EmailVerification",
-      TemplateData: `{ "link": "${link}" }`,
-      ReplyToAddresses: [],
-    };
-    sesClient.send(new SendTemplatedEmailCommand(params));
+    // const params = {
+    //   Destination: {
+    //     ToAddresses: [email],
+    //   },
+    //   Source: "swikarsharma@gmail.com",
+    //   Template: "EmailVerification",
+    //   TemplateData: `{ "link": "${link}" }`,
+    //   ReplyToAddresses: [],
+    // };
+    // sesClient.send(new SendTemplatedEmailCommand(params));
 
-    return res.json(user);
+    return res.status(200).json({ user, token });
   } catch (e) {
     console.error(e);
     return res.status(400).json({ error: "Failed to create user." });
@@ -124,7 +125,9 @@ const verification = async (req: Request, res: Response) => {
   }
   try {
     const decoded: any = jwt.verify(token, process.env.JWT_SECRET_KEY!);
-    const user = await userRepo.getOneUser({ email: decoded.email });
+    const user = await userRepo.getOneUser({
+      email: decoded.email,
+    });
     if (user) {
       await userRepo.verifyUser({
         email: decoded?.email,
@@ -133,7 +136,7 @@ const verification = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "user not found." });
     }
     console.log({ decoded });
-    return res.status(200).json({ messgae: "sucessfully verified" });
+    return res.status(200).json({ user, token });
   } catch (e) {
     console.error(e);
     return res.status(400).json({ error: "Invalid or expired token." });
@@ -142,59 +145,80 @@ const verification = async (req: Request, res: Response) => {
 
 //signin
 const signin = async (req: Request, res: Response) => {
-  const { email, username, password } = req.body;
-  const jwtToken = req.headers["authorization"];
+  const { email, password } = req.body;
 
   try {
-    let existingUser;
-    if (username) {
-      existingUser = await userRepo.getOneUser({ username });
-    } else if (email) {
-      existingUser = await userRepo.getOneUser({ email });
-    } else {
-      return res.status(400).json({ message: "Missing username or email" });
-    }
+    const existingUser = await userRepo.getOneUser({ email });
+
     if (!existingUser) {
-      return res.status(400).json({ message: "not existingUser" });
+      return res
+        .status(400)
+        .json({ errorType: "USER_NOT_FOUND", message: "User not found." });
     }
+
+    if (!existingUser.isVerified) {
+      const { sign } = jwt;
+      const token = sign(
+        {
+          email: email,
+          id: existingUser.id,
+        },
+        process.env.JWT_SECRET_KEY!
+      );
+      console.log({ accessToken: token });
+      const link = `${process.env.BLOG_PAGE}?token=${token}`;
+      console.log({ link });
+      return res.status(400).json({
+        errorType: "USER_NOT_VERIFIED",
+        message: "user not verified",
+        token,
+      });
+    }
+
     const matchPassword = bcrypt.compareSync(
       password,
       String(existingUser?.password)
     );
     if (!matchPassword) {
-      return res.status(400).json({ message: "Invalid Credentials" });
+      return res.status(400).json({
+        errorType: "INVALID_CREDENTIALS",
+        message: "Invalid credentials.",
+      });
     }
     const { sign } = jwt;
     const token = sign(
       { email: existingUser?.email, id: existingUser?.id },
       process.env.JWT_SECRET_KEY!
     );
-    return res.status(201).json({ user: existingUser, token });
-    console.log({ existingUser });
+    return res.status(200).json({ user: existingUser, token });
   } catch (e) {
     console.log(e);
-    return res.status(400).json({ error: "Failed to Signin." });
+    return res
+      .status(400)
+      .json({ errorType: "USER_NOT_FOUND", message: "User not found." });
   }
 };
 
 //middleware
 
-export const checkJwt = async (
+export const verifyUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const token = req.headers["authorization"];
+
   if (!token) {
     return res.status(401).json({ message: "No token provided." });
   }
-  console.log("token in middleware:", token);
   try {
+    console.log("token in middleware:", token);
     const { verify } = jwt;
     const decoded: any = verify(token, process.env.JWT_SECRET_KEY!);
+
+    console.log({ decoded });
     const user = await userRepo.getOneUser({ id: decoded.id });
     req.authUser = user as User;
-
     if (user) {
       next();
       // return res.status(201).json({ message: "nice intiative" });
@@ -207,37 +231,66 @@ export const checkJwt = async (
   }
 };
 
-//middleware for editing blog
-export const checkUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const token = req.headers["authorization"];
-  if (!token) {
-    return res.status(401).json({ message: "No token provided." });
-  }
-  console.log("token in middleware:", token);
+export const resetPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
   try {
-    const { verify } = jwt;
-    const decoded: any = verify(token as string, process.env.JWT_SECRET_KEY!);
-    const user = await userRepo.getOneUser({ email: decoded.email });
-    if (user) {
-      next();
-      // return res.status(201).json({ message: "nice intiative" });
+    const existingUser = await userRepo.getOneUser({ email: email });
+    if (existingUser) {
+      const { sign } = jwt;
+      const accessToken = sign(
+        {
+          email: email,
+        },
+        process.env.JWT_SECRET_KEY!
+      );
+      const link = `${process.env.AUTH_PAGE}?token=${accessToken}`;
+      console.log(link);
     } else {
-      return res.status(401).json({ message: "token invalid." });
+      return res.status(404).json({ message: " existing user not found." });
     }
+    return res.status(200).json({ message: "resetting password" });
   } catch (e) {
-    return res.status(401).json({ message: "token invalid." });
-    // console.log(e);
+    return res.status(401).json({ message: "email not exist." });
   }
 };
 
+//reset and updatig password
+const updatePassword = async (req: Request, res: Response) => {
+  console.log("hello");
+  // const { token } = req.query;
+  const { password, token } = req.body;
+  console.log({ password }, { token });
+
+  if (!token || typeof token !== "string") {
+    return res.status(400).json({ error: "Invalid or expired token." });
+  }
+  try {
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET_KEY!);
+    const email = decoded.email;
+    const user = await userRepo.getOneUser({ email: email });
+    if (user) {
+      const salt = bcrypt.genSaltSync(10);
+      const hash = await bcrypt.hash(password, salt);
+      await userRepo.updatePassword(email, hash);
+    } else {
+      return res.status(404).json({ error: "user not found." });
+    }
+    console.log({ decoded });
+    return res
+      .status(200)
+      .json({ messgae: "sucessfully updated the password", user });
+  } catch (e) {
+    console.error(e);
+    return res.status(400).json({ error: "Invalid or expired token." });
+  }
+};
 export const userController = {
   createUser,
   getAll,
   verification,
   signin,
+  resetPassword,
+  updatePassword,
   getAllCategory,
+  verifyUser,
 };
