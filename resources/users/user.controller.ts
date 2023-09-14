@@ -3,8 +3,7 @@ import { userRepo } from "./user.repo";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "@prisma/client";
-import { SendTemplatedEmailCommand } from "@aws-sdk/client-ses";
-import { sesClient } from "../../utils/ses";
+import nodemailer from "nodemailer";
 
 //get | query
 const getAll = async (req: Request, res: Response) => {
@@ -106,7 +105,26 @@ const createUser = async (req: Request, res: Response) => {
     //   ReplyToAddresses: [],
     // };
     // sesClient.send(new SendTemplatedEmailCommand(params));
-
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS,
+      },
+    });
+    let details = {
+      from: "<no-reply>@techEra.io",
+      to: email,
+      subject: "testing nodemailer with gmail",
+      text: `Hello world?${link}`,
+    };
+    transporter.sendMail(details, (err) => {
+      if (err) {
+        console.log("errorr aayo sir", err);
+      } else {
+        console.log("chalyo sir");
+      }
+    });
     return res.status(200).json({ user, token });
   } catch (e) {
     console.error(e);
