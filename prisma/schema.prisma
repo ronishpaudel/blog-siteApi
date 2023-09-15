@@ -38,6 +38,7 @@ model Post {
   description   String    @db.LongText
   imageUrl      String?   @db.VarChar(150)
   thumbImageUrl String?   @db.VarChar(150)
+  isDraft       Boolean   @default(false)
   user          User?     @relation(fields: [userId], references: [id])
   userId        Int?      @db.Int
   category      Category? @relation(fields: [categoryId], references: [id])
