@@ -109,6 +109,7 @@ const createUser = async (req: Request, res: Response) => {
       service: "gmail",
       auth: {
         user: process.env.EMAIL,
+
         pass: process.env.PASS,
       },
     });
@@ -135,9 +136,6 @@ const createUser = async (req: Request, res: Response) => {
 //signup verification
 const verification = async (req: Request, res: Response) => {
   const { token } = req.headers;
-
-  console.log({ headers: req.headers });
-  console.log({ token: token });
   if (!token || typeof token !== "string") {
     return res.status(400).json({ error: "Invalid or expired token." });
   }
