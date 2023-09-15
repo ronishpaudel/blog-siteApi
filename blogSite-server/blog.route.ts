@@ -16,4 +16,8 @@ blogRoute.get("/blogs/:slug", async (req, res) => {
 blogRoute.post("/blogs", verifyUser, async (req, res) => {
   await blogController.createBlog(req, res);
 });
+
+blogRoute.post("/draft-blogs", verifyUser, async (req, res) => {
+  await blogController.draftBlog(req, res);
+});
 export { blogRoute };

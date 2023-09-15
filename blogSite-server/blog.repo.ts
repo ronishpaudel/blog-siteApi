@@ -28,6 +28,9 @@ export const getAll = async (offset: number, pageSize: number) => {
       createdAt: true,
       slug: true,
     },
+    where: {
+      isDraft: false,
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -68,6 +71,7 @@ const getAllWithSearch = async (
       createdAt: true,
       slug: true,
     },
+
     orderBy: {
       createdAt: "desc",
     },
@@ -95,6 +99,7 @@ const getBlogById = async (id: number) => {
       title: true,
       description: true,
       imageUrl: true,
+      isDraft: false,
       thumbImageUrl: true,
       id: true,
       createdAt: true,
@@ -124,6 +129,7 @@ const getBlogBySlug = async (slug: string) => {
       title: true,
       description: true,
       imageUrl: true,
+      isDraft: false,
       thumbImageUrl: true,
       id: true,
       createdAt: true,
@@ -138,10 +144,16 @@ const createBlog = async (blogData: Prisma.PostCreateArgs["data"]) => {
   });
 };
 
+const blogDraft = async (blogData: Prisma.PostCreateArgs["data"]) => {
+  return await prisma.post.create({
+    data: blogData,
+  });
+};
 export const blogRepo = {
   getAll,
   getAllWithSearch,
   getBlogById,
   createBlog,
   getBlogBySlug,
+  blogDraft,
 };

@@ -68,9 +68,39 @@ const createBlog = async (req: Request, res: Response) => {
   }
 };
 
+//save as draft
+const draftBlog = async (req: Request, res: Response) => {
+  try {
+    const { title, description, imageUrl, categoryId, thumbImageUrl } =
+      req.body;
+
+    const authUser = req.authUser;
+    const slug =
+      title.toLowerCase().replaceAll(" ", "-") + "-" + String(randomNumber());
+
+    const blogData = {
+      title,
+      description,
+      imageUrl,
+      categoryId,
+      thumbImageUrl,
+      userId: authUser.id,
+      isDraft: true,
+      slug,
+    };
+
+    console.log({ blogData });
+
+    const blog = await blogRepo.blogDraft(blogData);
+    return res.json(blog);
+  } catch (e) {
+    if (e instanceof Error) res.status(404).send(e.message);
+  }
+};
 export const blogController = {
   getAll,
   getBlogById,
   createBlog,
   getBlogBySlug,
+  draftBlog,
 };
