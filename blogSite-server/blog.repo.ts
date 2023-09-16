@@ -99,7 +99,6 @@ const getBlogById = async (id: number) => {
       title: true,
       description: true,
       imageUrl: true,
-      isDraft: false,
       thumbImageUrl: true,
       id: true,
       createdAt: true,
@@ -129,7 +128,7 @@ const getBlogBySlug = async (slug: string) => {
       title: true,
       description: true,
       imageUrl: true,
-      isDraft: false,
+
       thumbImageUrl: true,
       id: true,
       createdAt: true,
