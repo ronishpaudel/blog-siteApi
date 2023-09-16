@@ -49,6 +49,7 @@ const getAllWithSearch = async (
       title: {
         contains: searchVal,
       },
+      isDraft: false,
     },
     select: {
       category: {
