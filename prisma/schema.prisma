@@ -21,6 +21,7 @@ model User {
   username        String    @unique @db.VarChar(25)
   password        String?   @db.VarChar(180)
   isVerified      Boolean   @default(false)
+  currentOTP      Int?      @db.Int
   loginToken      String?   @db.VarChar(100)
   googleAuthToken String?   @db.VarChar(50)
   phoneNumber     String?   @db.VarChar(18)
