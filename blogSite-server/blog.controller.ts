@@ -4,8 +4,9 @@ import { NextFunction, Request, Response } from "express";
 
 //get-query for blogs
 const getAll = async (req: Request, res: Response) => {
+  console.log(req.query);
   const currentPage = Number(req.query.page) || 1;
-  const pageSize = Number(req.query.page_size) || 9;
+  const pageSize = Number(req.query.pageSize) || 9;
   const offset = pageSize * (currentPage - 1);
   const searchVal = req.query.q;
   try {
