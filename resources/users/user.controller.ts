@@ -5,6 +5,11 @@ import jwt from "jsonwebtoken";
 import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
 
+//otpGenerator
+export function otpGenerator() {
+  return Math.floor(100000 + Math.random() * 900000);
+}
+
 //get | query
 const getAll = async (req: Request, res: Response) => {
   const currentPage = Number(req.query.page) || 1;
@@ -60,7 +65,7 @@ const getAllCategory = async (req: Request, res: Response) => {
 //post | mutation for user
 //signup
 const createUser = async (req: Request, res: Response) => {
-  const { id, email, fname, lname, password, phoneNumber, username } = req.body;
+  const { email, fname, lname, password, phoneNumber, username } = req.body;
 
   try {
     const existingUser = await userRepo.getOneUser({ email: email });
@@ -70,6 +75,7 @@ const createUser = async (req: Request, res: Response) => {
     }
     const salt = bcrypt.genSaltSync(10);
     const hash = await bcrypt.hash(password, salt);
+    const Otp = otpGenerator();
     const userData = {
       email: email,
       username,
@@ -77,6 +83,7 @@ const createUser = async (req: Request, res: Response) => {
       password: hash,
       lname: lname,
       phoneNumber: String(phoneNumber),
+      currentOTP: Otp,
     };
     const user = await userRepo.createUser(userData);
     console.log({ user });
@@ -90,9 +97,9 @@ const createUser = async (req: Request, res: Response) => {
       },
       process.env.JWT_SECRET_KEY!
     );
-    console.log({ accessToken: token });
-    const link = `${process.env.BLOG_PAGE}?token=${token}`;
-    console.log({ link });
+
+    console.log({ aayoOTP: Otp });
+    const link = `${Otp}`;
 
     //send verify email
     // const params = {
@@ -105,6 +112,7 @@ const createUser = async (req: Request, res: Response) => {
     //   ReplyToAddresses: [],
     // };
     // sesClient.send(new SendTemplatedEmailCommand(params));
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -126,14 +134,14 @@ const createUser = async (req: Request, res: Response) => {
         console.log("chalyo sir");
       }
     });
-    return res.status(200).json({ user, token });
+    return res.status(200).json({ user, token, email });
   } catch (e) {
     console.error(e);
     return res.status(400).json({ error: "Failed to create user." });
   }
 };
 
-//signup verification
+//signup verification iin web
 const verification = async (req: Request, res: Response) => {
   const { token } = req.headers;
   if (!token || typeof token !== "string") {
@@ -156,6 +164,32 @@ const verification = async (req: Request, res: Response) => {
   } catch (e) {
     console.error(e);
     return res.status(400).json({ error: "Invalid or expired token." });
+  }
+};
+
+//signup verification in mobile through OTP
+const otpVerification = async (req: Request, res: Response) => {
+  const { otp, email } = req.body;
+  console.log({ email, otp });
+  if (!otp || typeof otp !== "string") {
+    return res.status(400).json({ error: "Invalid or expired token." });
+  }
+  try {
+    const user = await userRepo.getOneUser({
+      email,
+    });
+    if (user?.currentOTP?.toString() === otp.toString()) {
+      await userRepo.verifyUser({
+        email,
+      });
+    } else {
+      return res.status(404).json({ error: "user not found." });
+    }
+    console.log({ user });
+    return res.status(200).json({ user });
+  } catch (e) {
+    console.error(e);
+    return res.status(400).json({ error: "Invalid." });
   }
 };
 
@@ -226,6 +260,7 @@ const signin = async (req: Request, res: Response) => {
       { email: existingUser?.email, id: existingUser?.id },
       process.env.JWT_SECRET_KEY!
     );
+    console.log({ existingUser });
     return res.status(200).json({ user: existingUser, token });
   } catch (e) {
     console.log(e);
@@ -350,4 +385,5 @@ export const userController = {
   updatePassword,
   getAllCategory,
   verifyUser,
+  otpVerification,
 };

@@ -46,4 +46,7 @@ userRoute.post("/user/reset-password", async (req, res) => {
 userRoute.post("/user/update-password", async (req, res) => {
   await userController.updatePassword(req, res);
 });
+userRoute.post("/user/otp-verify", async (req, res) => {
+  await userController.otpVerification(req, res);
+});
 export { userRoute };
