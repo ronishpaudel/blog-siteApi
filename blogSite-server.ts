@@ -27,6 +27,7 @@ app.put("/blogs", verifyUser, async (req, res) => {
   try {
     const { id, title, description, imageUrl, categoryId, thumbImageUrl } =
       req.body;
+
     const authUser = req.authUser;
 
     const updatedBlogs = await prisma.post.update({
