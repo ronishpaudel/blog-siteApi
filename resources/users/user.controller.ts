@@ -99,7 +99,10 @@ const createUser = async (req: Request, res: Response) => {
     );
 
     console.log({ aayoOTP: Otp });
-    const link = `${Otp}`;
+    console.log({ accessToken: token });
+    const link = `${process.env.BLOG_PAGE_DEPLOYEMENT}?token=${token} for mobile app ${Otp}`;
+    //BLOG_PAGE_DEPLOYMENT for vercel and for production BLOG_PAGE_PRODUCTION
+    console.log({ link });
 
     //send verify email
     // const params = {
