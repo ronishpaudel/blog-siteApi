@@ -101,7 +101,8 @@ const createUser = async (req: Request, res: Response) => {
 
     console.log({ aayoOTP: Otp });
     console.log({ accessToken: token });
-    const link = `${process.env.BLOG_PAGE_DEPLOYMENT}?token=${token} for mobile app ${Otp}`;
+    const link = `${process.env.BLOG_PAGE_PRODUCTION}?token=${token} for mobile app ${Otp}`;
+    // for mobile app ${Otp}`;
     //BLOG_PAGE_DEPLOYMENT for vercel and for production BLOG_PAGE_PRODUCTION
     console.log({ link });
 
@@ -129,7 +130,7 @@ const createUser = async (req: Request, res: Response) => {
       from: "<no-reply>@techEra.io",
       to: email,
       subject: "Verify Your Account",
-      html: emailBody(link),
+      html: emailBody({ link, username, Otp }),
     };
     transporter.sendMail(details, (err) => {
       if (err) {
@@ -148,6 +149,7 @@ const createUser = async (req: Request, res: Response) => {
 //signup verification iin web
 const verification = async (req: Request, res: Response) => {
   const { token } = req.headers;
+  console.log({ verificationToken: token });
   if (!token || typeof token !== "string") {
     return res.status(400).json({ error: "Invalid or expired token." });
   }
