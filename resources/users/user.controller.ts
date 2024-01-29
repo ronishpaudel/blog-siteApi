@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
+import { emailBody } from "../../emailDesign";
 
 //otpGenerator
 export function otpGenerator() {
@@ -100,7 +101,7 @@ const createUser = async (req: Request, res: Response) => {
 
     console.log({ aayoOTP: Otp });
     console.log({ accessToken: token });
-    const link = `${process.env.BLOG_PAGE_DEPLOYEMENT}?token=${token} for mobile app ${Otp}`;
+    const link = `${process.env.BLOG_PAGE_DEPLOYMENT}?token=${token} for mobile app ${Otp}`;
     //BLOG_PAGE_DEPLOYMENT for vercel and for production BLOG_PAGE_PRODUCTION
     console.log({ link });
 
@@ -127,8 +128,8 @@ const createUser = async (req: Request, res: Response) => {
     let details = {
       from: "<no-reply>@techEra.io",
       to: email,
-      subject: "testing nodemailer with gmail",
-      text: `Hello world?${link}`,
+      subject: "Verify Your Account",
+      html: emailBody(link),
     };
     transporter.sendMail(details, (err) => {
       if (err) {
