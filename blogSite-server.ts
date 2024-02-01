@@ -9,8 +9,16 @@ import { OAuth2Client, TokenPayload } from "google-auth-library";
 const prisma = new PrismaClient();
 
 const app = express();
-var cors = require("cors");
+const cors = require("cors");
 var jwt = require("jsonwebtoken");
+
+app.use(
+  cors({
+    origin: process.env.PORT,
+    methods: ["POST", "GET", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 const Port = 3007;

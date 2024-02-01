@@ -71,7 +71,10 @@ const createUser = async (req: Request, res: Response) => {
   try {
     const existingUser = await userRepo.getOneUser({ email: email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({
+        errorType: "User_already_exists",
+        message: "User already exists",
+      });
       // throw "user already exists";
     }
     const salt = bcrypt.genSaltSync(10);
