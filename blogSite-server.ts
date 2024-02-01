@@ -12,13 +12,6 @@ const app = express();
 var cors = require("cors");
 var jwt = require("jsonwebtoken");
 
-app.use(
-  cors({
-    origin: [process.env.PORT],
-    methods: ["POST", "GET"],
-    credentials: true,
-  })
-);
 app.use(express.json());
 const Port = 3007;
 
