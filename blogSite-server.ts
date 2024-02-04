@@ -11,13 +11,8 @@ const prisma = new PrismaClient();
 const app = express();
 const cors = require("cors");
 var jwt = require("jsonwebtoken");
-const corsCofig = {
-  origin: "*",
-  methods: ["POST", "GET", "PUT", "DELETE"],
-  credentials: true,
-};
-app.use(cors(corsCofig));
-app.options("", cors(corsCofig));
+
+app.use(cors());
 
 app.use(express.json());
 const Port = 3007;
