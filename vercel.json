@@ -1,28 +1,3 @@
 {
-    "name": "express-blog-site-server",
-    "version": 2,
-    "public": true,
-    "builds": [
-      {
-        "src": "blogSite-server.ts",
-        "use": "@vercel/node"
-      },
-      {
-        "src": "public/**",
-        "use": "@vercel/static"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/((?!.*\\.\\w+$).*)",
-        "dest": "blogSite-server.ts",
-        "methods":["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
-      },
-      {
-        "src": "/(.+\\.[a-z]+)$",
-        "dest": "/public/$1"
-      }
-    ]
-  }
-
-  
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }]
+}
