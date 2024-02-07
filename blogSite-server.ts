@@ -1,9 +1,9 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-import { userRoute } from "../resources/users";
-import { verifyUser } from "../resources/users/user.controller";
-import { s3Upload } from "../utils/s3Upload";
-import { blogRoute } from "../blogSite-server/blog.route";
+import { userRoute } from "./resources/users";
+import { verifyUser } from "./resources/users/user.controller";
+import { s3Upload } from "./utils/s3Upload";
+import { blogRoute } from "./blogSite-server/blog.route";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import cors from "cors";
 
