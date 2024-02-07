@@ -5,8 +5,7 @@ import { blogRoute } from "../../blogSite-server";
 
 const app = express();
 
-const router = Router();
-router.get("/hello", (req, res) => res.send("Hello World!"));
+app.get("/hello", (req, res) => res.send("Hello World!"));
 
 app.use(userRoute);
 app.use(blogRoute);
