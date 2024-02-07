@@ -1,6 +1,7 @@
 import express from "express";
-import { blogController } from ".";
+
 import { verifyUser } from "../resources/users/user.controller";
+import { blogController } from "./blog.controller";
 
 const blogRoute = express.Router();
 
