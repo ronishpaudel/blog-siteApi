@@ -96,6 +96,7 @@ app.post("/user/category", async (req, res) => {
 app.listen(Port, () => {
   console.log(`Server up on port ${Port}`);
 });
+
 export { blogRoute };
 
 // email verification template sample not being used just for reading purpose
