@@ -78,7 +78,6 @@ app.post("/s3_upload_url", async (_, res) => {
     });
   }
 });
-
 app.post("/user/category", async (req, res) => {
   try {
     const { name } = req.body;
