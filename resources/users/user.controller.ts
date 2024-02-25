@@ -97,9 +97,11 @@ const createUser = async (req: Request, res: Response) => {
       {
         email: email,
         id: user.id,
-        // exp: 10 * 60 * 1000,
       },
-      process.env.JWT_SECRET_KEY!
+      process.env.JWT_SECRET_KEY!,
+      {
+        expiresIn: "2m",
+      }
     );
 
     console.log({ aayoOTP: Otp });
@@ -222,7 +224,10 @@ const signin = async (req: Request, res: Response) => {
           email: email,
           id: existingUser.id,
         },
-        process.env.JWT_SECRET_KEY!
+        process.env.JWT_SECRET_KEY!,
+        {
+          expiresIn: "2m",
+        }
       );
       console.log({ accessToken: token });
       const link = `${process.env.BLOG_PAGE}?token=${token}`;
@@ -267,7 +272,10 @@ const signin = async (req: Request, res: Response) => {
     const { sign } = jwt;
     const token = sign(
       { email: existingUser?.email, id: existingUser?.id },
-      process.env.JWT_SECRET_KEY!
+      process.env.JWT_SECRET_KEY!,
+      {
+        expiresIn: "2m",
+      }
     );
     console.log({ existingUser });
     return res.status(200).json({ user: existingUser, token });
@@ -321,7 +329,8 @@ export const resetPassword = async (req: Request, res: Response) => {
         {
           email: email,
         },
-        process.env.JWT_SECRET_KEY!
+        process.env.JWT_SECRET_KEY!,
+        { expiresIn: "2m" }
       );
       const link = `${process.env.AUTH_PAGE_DEPLOYMENT}?token=${token}`;
       console.log(link);
