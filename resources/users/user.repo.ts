@@ -37,6 +37,7 @@ export const getAllWithSearch = async (
     },
   });
 };
+
 const getOneUser = async (payload: Prisma.UserWhereUniqueInput) => {
   return await prisma.user.findUnique({
     where: payload,
