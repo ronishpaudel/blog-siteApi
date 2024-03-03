@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express from "express";
 import serverless from "serverless-http";
 import { userRoute } from "../../resources/users";
 import { blogRoute } from "../../blogSite-server";
