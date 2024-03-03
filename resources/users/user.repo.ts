@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient, User } from "@prisma/client";
-import { IUserData, Icategory } from "../../types/types";
+import { IUserData } from "../../types/types";
 
 const prisma = new PrismaClient();
 
