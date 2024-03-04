@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "@prisma/client";
 import nodemailer from "nodemailer";
-import { emailBody, forgetPassword } from "../../mailTemplate";
+import { emailBody, forgetPassword } from "../../utils/mailTemplate";
 
 //otpGenerator
 export function otpGenerator() {
