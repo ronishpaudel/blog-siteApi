@@ -196,7 +196,7 @@ const otpVerification = async (req: Request, res: Response) => {
     } else {
       return res.status(404).json({ error: "user not found." });
     }
-    console.log({ user });
+
     return res.status(200).json({ user });
   } catch (e) {
     return res.status(400).json({ error: "Invalid." });
