@@ -271,10 +271,10 @@ const signin = async (req: Request, res: Response) => {
     const { sign } = jwt;
     const token = sign(
       { email: existingUser?.email, id: existingUser?.id },
-      process.env.JWT_SECRET_KEY!,
-      {
-        expiresIn: "2m",
-      }
+      process.env.JWT_SECRET_KEY!
+      // {
+      //   expiresIn: "2m",
+      // }
     );
     console.log({ existingUser });
     return res.status(200).json({ user: existingUser, token });
