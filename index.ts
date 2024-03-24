@@ -6,6 +6,7 @@ import { s3Upload } from "./utils/s3Upload";
 import { blogRoute } from "./blogSite-server/blog.route";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import cors from "cors";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,47 @@ app.get("/", (req, res) => {
   return res.send("Hello,world");
 });
 
+app.get("/myblogs", async (req, res) => {
+  try {
+    const token = req.headers["authorization"];
+    console.log({ myblogsToken: token });
+    const { verify } = jwt;
+    if (!token) {
+      return res.status(401).json({ message: "No token provided." });
+    }
+    const decoded: any = verify(String(token), process.env.JWT_SECRET_KEY!);
+
+    const myblogs = await prisma.post.findMany({
+      where: {
+        userId: decoded?.id,
+      },
+      select: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        title: true,
+        description: true,
+        imageUrl: true,
+        thumbImageUrl: true,
+        id: true,
+        createdAt: true,
+        slug: true,
+      },
+    });
+    return res.json(myblogs);
+  } catch (e) {
+    return res.status(404).send("blogs Not found");
+  }
+});
 app.put("/blogs", verifyUser, async (req, res) => {
   try {
     const { id, title, description, imageUrl, categoryId, thumbImageUrl } =
@@ -98,7 +140,7 @@ app.listen(Port, () => {
 
 export { blogRoute };
 
-// email verification template sample not being used just for reading purpose
+// email verification template sample not being used for reading purpose
 var EmailVerificationTemplate = {
   Template: {
     TemplateName: "EmailVerification",
