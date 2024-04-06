@@ -287,7 +287,6 @@ const signin = async (req: Request, res: Response) => {
 };
 
 //middleware
-
 export const verifyUser = async (
   req: Request,
   res: Response,
