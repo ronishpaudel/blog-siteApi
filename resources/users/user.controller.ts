@@ -44,7 +44,7 @@ const getAllCategory = async (req: Request, res: Response) => {
   const pageSize = Number(req.query.page_size) || 10;
   const offset = pageSize * (currentPage - 1);
   const searchVal = req.query.q;
-  console.log("controller bhitra category chiryo", { searchVal });
+  // console.log("controller bhitra category chiryo", { searchVal });
   try {
     if (!searchVal) {
       const categories = await userRepo.getAllCategory(offset, pageSize);
@@ -98,10 +98,10 @@ const createUser = async (req: Request, res: Response) => {
         email: email,
         id: user.id,
       },
-      process.env.JWT_SECRET_KEY!,
-      {
-        expiresIn: "2m",
-      }
+      process.env.JWT_SECRET_KEY!
+      // {
+      //   expiresIn: "2m",
+      // }
     );
 
     console.log({ aayoOTP: Otp });
@@ -223,10 +223,10 @@ const signin = async (req: Request, res: Response) => {
           email: email,
           id: existingUser.id,
         },
-        process.env.JWT_SECRET_KEY!,
-        {
-          expiresIn: "2m",
-        }
+        process.env.JWT_SECRET_KEY!
+        // {
+        //   expiresIn: "2m",
+        // }
       );
       console.log({ accessToken: token });
       const link = `${process.env.BLOG_PAGE}?token=${token}`;
