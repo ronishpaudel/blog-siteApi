@@ -9,9 +9,6 @@ export const getAll = async (offset: number, pageSize: number) => {
   return await prisma.user.findMany({
     skip: offset,
     take: pageSize,
-    select: {
-      isVerified: true,
-    },
     orderBy: {
       createdAt: "desc",
     },
