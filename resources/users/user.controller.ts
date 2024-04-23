@@ -17,7 +17,7 @@ const getAll = async (req: Request, res: Response) => {
   const pageSize = Number(req.query.page_size) || 10;
   const offset = pageSize * (currentPage - 1);
   const searchVal = req.query.q;
-  console.log("controller bhitra chiryo", { searchVal });
+  //console.log("controller bhitra chiryo", { searchVal });
   try {
     if (!searchVal) {
       const users = await userRepo.getAll(offset, pageSize);
