@@ -9,7 +9,6 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-
 const app = express();
 
 app.use(cors());
