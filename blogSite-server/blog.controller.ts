@@ -45,11 +45,9 @@ const createBlog = async (req: Request, res: Response) => {
   try {
     const { title, description, imageUrl, categoryId, thumbImageUrl } =
       req.body;
-
     const authUser = req.authUser;
     const slug =
       title.toLowerCase().replaceAll(" ", "-") + "-" + String(randomNumber());
-
     const blogData = {
       title,
       description,
