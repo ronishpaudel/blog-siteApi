@@ -85,7 +85,6 @@ const draftBlog = async (req: Request, res: Response) => {
       isDraft: true,
       slug,
     };
-
     console.log({ blogData });
 
     const blog = await blogRepo.blogDraft(blogData);
