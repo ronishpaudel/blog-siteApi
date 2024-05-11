@@ -154,7 +154,7 @@ const createUser = async (req: Request, res: Response) => {
 //signup verification iin web
 const verification = async (req: Request, res: Response) => {
   const { token } = req.headers;
-  console.log({ verificationToken: token });
+  //console.log({ verificationToken: token });
   if (!token || typeof token !== "string") {
     return res.status(400).json({ error: "Invalid or expired token." });
   }
@@ -170,7 +170,7 @@ const verification = async (req: Request, res: Response) => {
     } else {
       return res.status(404).json({ error: "user not found." });
     }
-    console.log({ decoded });
+    //console.log({ decoded });
     return res.status(200).json({ user, token });
   } catch (e) {
     console.error(e);
