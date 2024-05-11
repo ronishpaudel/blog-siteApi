@@ -181,7 +181,7 @@ const verification = async (req: Request, res: Response) => {
 //signup verification in mobile through OTP
 const otpVerification = async (req: Request, res: Response) => {
   const { otp, email } = req.body;
-  console.log({ email, otp });
+  //console.log({ email, otp });
   if (!otp || typeof otp !== "string") {
     return res.status(400).json({ error: "Invalid or expired token." });
   }
