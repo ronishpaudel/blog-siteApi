@@ -90,7 +90,7 @@ const createUser = async (req: Request, res: Response) => {
       currentOTP: Otp,
     };
     const user = await userRepo.createUser(userData);
-    console.log({ user });
+    //console.log({ user });
 
     const { sign } = jwt;
     const token = sign(
@@ -104,7 +104,7 @@ const createUser = async (req: Request, res: Response) => {
       // }
     );
 
-    console.log({ aayoOTP: Otp });
+    //console.log({ aayoOTP: Otp });
     console.log({ accessToken: token });
     const link = `${process.env.BLOG_PAGE_DEPLOYMENT}?token=${token}`;
     // for mobile app ${Otp}`;
