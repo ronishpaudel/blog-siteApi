@@ -173,7 +173,7 @@ const verification = async (req: Request, res: Response) => {
     //console.log({ decoded });
     return res.status(200).json({ user, token });
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     return res.status(400).json({ error: "Invalid or expired token." });
   }
 };
@@ -276,7 +276,7 @@ const signin = async (req: Request, res: Response) => {
       //   expiresIn: "2m",
       // }
     );
-    console.log({ existingUser });
+    //console.log({ existingUser });
     return res.status(200).json({ user: existingUser, token });
   } catch (e) {
     console.log(e);
