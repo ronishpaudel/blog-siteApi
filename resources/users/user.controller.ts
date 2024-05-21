@@ -302,7 +302,7 @@ export const verifyUser = async (
     const { verify } = jwt;
     const decoded: any = verify(token, process.env.JWT_SECRET_KEY!);
 
-    console.log({ decoded });
+    //console.log({ decoded });
     const user = await userRepo.getOneUser({ id: decoded.id });
     req.authUser = user as User;
     if (user) {
