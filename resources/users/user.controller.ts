@@ -340,6 +340,7 @@ export const resetPassword = async (req: Request, res: Response) => {
           pass: process.env.PASS,
         },
       });
+
       let details = {
         from: "<no-reply>@techEra.io",
         to: email,
