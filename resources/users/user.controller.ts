@@ -206,7 +206,6 @@ const otpVerification = async (req: Request, res: Response) => {
 //signin
 const signin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
   try {
     const existingUser = await userRepo.getOneUser({ email });
 
