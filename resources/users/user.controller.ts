@@ -257,7 +257,6 @@ const signin = async (req: Request, res: Response) => {
         token,
       });
     }
-
     const matchPassword = bcrypt.compareSync(
       password,
       String(existingUser?.password)
