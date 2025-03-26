@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
+  provider     = "postgresql"
   url          = env("DATABASE_URL")
+  directUrl    = env("DIRECT_URL")
   relationMode = "prisma"
 }
 
@@ -16,12 +17,12 @@ model User {
   address         String?   @db.VarChar(50)
   fname           String?   @db.VarChar(40)
   lname           String?   @db.VarChar(40)
-  dob             DateTime? @db.DateTime()
+  dob             DateTime? @db.Timestamp()
   email           String    @unique @db.VarChar(80)
   username        String    @unique @db.VarChar(25)
   password        String?   @db.VarChar(180)
   isVerified      Boolean   @default(false)
-  currentOTP      Int?      @db.Int
+  currentOTP      Int?      @db.Integer
   loginToken      String?   @db.VarChar(100)
   googleAuthToken String?   @db.VarChar(50)
   phoneNumber     String?   @db.VarChar(18)
@@ -36,17 +37,17 @@ model Post {
   id            Int       @id @default(autoincrement())
   title         String    @db.VarChar(120)
   slug          String    @unique @db.VarChar(130)
-  description   String    @db.LongText
+  description   String    @db.Text
   imageUrl      String?   @db.VarChar(150)
   thumbImageUrl String?   @db.VarChar(150)
   isDraft       Boolean   @default(false)
   user          User?     @relation(fields: [userId], references: [id])
-  userId        Int?      @db.Int
+  userId        Int?      @db.Integer
   category      Category? @relation(fields: [categoryId], references: [id])
-  categoryId    Int?      @db.Int
+  categoryId    Int?      @db.Integer
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  completed     Int       @default(0) @db.TinyInt
+  completed     Int       @default(0) @db.SmallInt
 
   @@index([userId])
   @@index([categoryId])
